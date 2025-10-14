@@ -1,6 +1,6 @@
 // Type definition for the Product
 export type Product = {
-  readonly id: string;           // Unique key for persistence
+  readonly id: string; // Unique key for persistence
   readonly name: string;
   readonly price: number;
   readonly category?: string;
