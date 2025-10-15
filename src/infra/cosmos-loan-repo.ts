@@ -11,11 +11,11 @@ interface Options {
 
 interface LoanDTO {
   id: string;
-  amount: number;
-  borrower: string;
+  borrowerName: string;
+  device: string;
   status: string;
   createdAt: string;
-  // Add other fields as needed
+  expiresAt: string;
 }
 
 export class LoanRepoCosmos implements LoanRepo {
@@ -35,20 +35,22 @@ export class LoanRepoCosmos implements LoanRepo {
   private toDTO(loan: Loan): LoanDTO {
     return {
       id: loan.id,
-      amount: loan.amount,
-      borrower: loan.borrower,
+      borrowerName: loan.borrowerName,
+      device: loan.device,
       status: loan.status,
-      createdAt: loan.createdAt.toISOString(),
+      createdAt: loan.createdAt,
+      expiresAt: loan.expiresAt,
     };
   }
 
   private fromDTO(dto: LoanDTO): Loan {
     return {
       id: dto.id,
-      amount: dto.amount,
-      borrower: dto.borrower,
-      status: dto.status,
-      createdAt: new Date(dto.createdAt),
+      borrowerName: dto.borrowerName,
+      device: dto.device,
+      status: dto.status as Loan['status'],
+      createdAt: dto.createdAt,
+      expiresAt: dto.expiresAt,
     };
   }
 
@@ -63,14 +65,14 @@ export class LoanRepoCosmos implements LoanRepo {
       .query<LoanDTO>(query)
       .fetchAll();
 
-    return resources.map(this.fromDTO);
+    return resources.map((dto) => this.fromDTO(dto));
   }
 
   async getById(id: string): Promise<Loan | null> {
     try {
       const { resource } = await this.container.item(id, id).read<LoanDTO>();
       return resource ? this.fromDTO(resource) : null;
-    } catch (err) {
+    } catch (err: any) {
       if (err.code === 404) return null;
       throw err;
     }
